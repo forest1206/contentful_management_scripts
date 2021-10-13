@@ -1,0 +1,22 @@
+{
+  "name": "contentful-upload",
+  "version": "1.0.0",
+  "description": "contentful management script",
+  "main": "upload.js",
+  "dependencies": {
+    "contentful-management": "^7.29.0",
+    "dotenv": "^10.0.0"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "dev": "node index.js",
+    "get-types": "node getContentType.js",
+    "upload": "node uploadFile.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "contentful"
+  ],
+  "author": "Robert popescu",
+  "license": "ISC"
+}
