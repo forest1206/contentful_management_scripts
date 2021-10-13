@@ -26,45 +26,47 @@ if (process.env.HTTPS_PROXY) {
 }
 const sdkClient = sdk.createClient(clientConfig);
 
-async function uploadFile(environment, filePath, fileName, contentType) {
-  try {
-    console.log("uploadFile", environment, filePath, fileName, contentType);
-
-    const upload = await environment.createUpload({
+function uploadFile(environment, filePath, fileName, contentType) {
+  return environment
+    .createUpload({
       file: fs.readFileSync(filePath),
       contentType,
       fileName,
-    });
-    console.log("createUpload-->", upload);
-
-    const asset = await environment.createAsset({
-      fields: {
-        title: {
-          "en-US": fileName,
-        },
-        file: {
-          "en-US": {
-            fileName: fileName,
-            contentType: contentType,
-            uploadFrom: {
-              sys: {
-                type: "Link",
-                linkType: "Upload",
-                id: upload.sys.id,
+    })
+    .then((upload) => {
+      return environment
+        .createAsset({
+          fields: {
+            title: {
+              "en-US": fileName,
+            },
+            file: {
+              "en-US": {
+                fileName: fileName,
+                contentType: contentType,
+                uploadFrom: {
+                  sys: {
+                    type: "Link",
+                    linkType: "Upload",
+                    id: upload.sys.id,
+                  },
+                },
               },
             },
           },
-        },
-      },
+        })
+        .then((asset) => {
+          console.log("prcessing...");
+          return asset.processForLocale("en-US", { processingCheckWait: 2000 });
+        })
+        .then((asset) => {
+          console.log("publishing...");
+          return asset.publish();
+        })
+        .catch((error) => {
+          console.log(`uploadFile:error`, error);
+        });
     });
-    console.log("createAsset-->", upload);
-
-    await asset.processForLocale("en-US", { processingCheckWait: 2000 });
-    // await asset.publish();
-    return asset;
-  } catch (error) {
-    console.log("uploadFile->error", error);
-  }
 }
 
 async function uploadDir(folder) {
@@ -75,8 +77,9 @@ async function uploadDir(folder) {
 
     fs.readdirSync(folder).forEach(async (file) => {
       console.log(file);
-      const filePath = `./images/${file}`;
+      const filePath = `${folder}/${file}`;
       const fileName = file.split(".")[0];
+      
       const contentType = `image/${file.split(".")[1]}`;
       console.log("uploadDir->file", filePath, fileName, contentType);
 

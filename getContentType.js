@@ -34,17 +34,6 @@ async function getContentTypes() {
     const json = JSON.stringify(contentTypes);
     console.log("getContentTypes:res", contentTypes);
 
-    // const res = await environment.createEntry("customer", {
-    //   fields: {
-    //     firstName: {
-    //       "en-US": "Jhon",
-    //     },
-    //     phoneNumber: {
-    //       "en-US": "(123) 123-1234",
-    //     },
-    //   },
-    // });
-
     let callback = () => {};
     fs.writeFile("contentTypes.json", json, "utf8", callback);
   } catch (error) {
